@@ -52,11 +52,17 @@ jobs:
           chmod 600 ecfkey.pem
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.EC2_INSTANCE_IP }} >> ~/.ssh/known_hosts
-      - name: Deploy Application
+
+      - name: Deploy Application to EC2
         run: |
-          scp -i ecfkey.pem target/* ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
+          # Copier le fichier JAR
+          scp -i ecfkey.pem target/*.jar ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
+
+          # Copier Dockerfile et docker-compose.yml
           scp -i ecfkey.pem Dockerfile ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
           scp -i ecfkey.pem docker-compose.yml ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
+
+          # Exécution des commandes sur EC2
           ssh -i ecfkey.pem ec2-user@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
             cd /home/ec2-user/
             docker-compose down
