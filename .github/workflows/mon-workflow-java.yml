@@ -34,11 +34,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: List files in target directory for debugging
-        run: |
-          echo "Listing files in target directory"
-          ls -l target/
-
       - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
