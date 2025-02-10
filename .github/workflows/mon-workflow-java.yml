@@ -49,6 +49,6 @@ jobs:
           scp -i ecfkey.pem target/*.jar ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
           ssh -i ecfkey.pem ec2-user@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
             cd /home/ec2-user/
-            docker compose down
-            docker compose up -d --build
+            docker-compose down
+            docker-compose up -d --build
           EOF
