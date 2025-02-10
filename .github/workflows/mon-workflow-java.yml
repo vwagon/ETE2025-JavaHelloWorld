@@ -49,7 +49,7 @@ jobs:
           ssh-keyscan -H ${{ secrets.EC2_INSTANCE_IP }} >> ~/.ssh/known_hosts
       - name: Deploy Application
         run: |
-          scp -i ecfkey.pem target/*.jar ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
+          scp -i ecfkey.pem target/* ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
           scp -i ecfkey.pem Dockerfile ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
           scp -i ecfkey.pem docker-compose.yml ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
           ssh -i ecfkey.pem ec2-user@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
