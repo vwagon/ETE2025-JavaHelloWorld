@@ -26,6 +26,8 @@ jobs:
         with:
           name: YourMedia
           path: target/*.jar
+                Dockerfile
+                docker-compose.yml
 
   deploy:
     runs-on: ubuntu-latest
@@ -47,6 +49,8 @@ jobs:
       - name: Deploy Application
         run: |
           scp -i ecfkey.pem target/*.jar ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
+          scp -i ecfkey.pem Dockerfile ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
+          scp -i ecfkey.pem docker-compose.yml ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
           ssh -i ecfkey.pem ec2-user@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
             cd /home/ec2-user/
             docker-compose down
