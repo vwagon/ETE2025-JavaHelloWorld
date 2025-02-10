@@ -28,6 +28,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: YourMedia
+          include-hidden-files: true
           path: |
             target/hello-world-0.0.1-SNAPSHOT.jar
             Dockerfile
@@ -42,7 +43,8 @@ jobs:
         with:
           name: YourMedia
           path: target/
-
+      - name: Check downloaded files
+        run: ls -l target/
       - name: Setup SSH Key
         run: |
           echo "${{ secrets.AWS_SSH_KEY }}" > ecfkey.pem
@@ -56,7 +58,7 @@ jobs:
           # Tentative d'envoi des fichiers sur EC2
           scp -i ecfkey.pem Dockerfile ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
           scp -i ecfkey.pem docker-compose.yml ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
-          scp -r -i ecfkey.pem target/*.jar Dockerfile docker-compose.yml ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
+          scp -i ecfkey.pem target/*.jar Dockerfile docker-compose.yml ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
 
           # Exécution des commandes sur EC2
           ssh -i ecfkey.pem ec2-user@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
