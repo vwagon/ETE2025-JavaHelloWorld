@@ -25,9 +25,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: YourMedia
-          path: target/*.jar
-                Dockerfile
-                docker-compose.yml
+          path: |
+            target/*.jar
+            Dockerfile
+            docker-compose.yml
 
   deploy:
     runs-on: ubuntu-latest
