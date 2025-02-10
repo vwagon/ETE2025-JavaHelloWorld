@@ -40,6 +40,7 @@ jobs:
       - name: Setup SSH Key
         run: |
           echo "${{ secrets.AWS_SSH_KEY }}" > ecfkey.pem
+          ls -l ecfkey.pem
           chmod 600 ecfkey.pem
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.EC2_INSTANCE_IP }} >> ~/.ssh/known_hosts
