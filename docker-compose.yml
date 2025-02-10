@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build: .
@@ -70,3 +68,7 @@ services:
 volumes:
   grafana-storage:
   prometheus-data:
+
+networks:
+  spring-net:
+    driver: bridge
