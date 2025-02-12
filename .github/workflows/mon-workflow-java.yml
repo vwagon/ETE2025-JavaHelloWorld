@@ -21,9 +21,6 @@ jobs:
       - name: Build with Maven
         run: mvn clean package -DskipTests
 
-      - name: List files in target directory for debugging
-        run: ls -l target/
-
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -43,13 +40,10 @@ jobs:
         with:
           name: YourMedia
           path: .
-          
-      - name: Check downloaded files
-        run: ls -l target/*
+
       - name: Setup SSH Key
         run: |
           echo "${{ secrets.AWS_SSH_KEY }}" > ecfkey.pem
-          ls -l ecfkey.pem
           chmod 600 ecfkey.pem
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.EC2_INSTANCE_IP }} >> ~/.ssh/known_hosts
@@ -62,6 +56,5 @@ jobs:
           ssh -T -i ecfkey.pem ec2-user@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
             cd /home/ec2-user/
             docker-compose down
-            ls -l target/
             docker-compose up -d --build
           EOF
