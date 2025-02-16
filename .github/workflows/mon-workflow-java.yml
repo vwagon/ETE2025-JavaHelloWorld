@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout the code
         uses: actions/checkout@v4
 
       - name: Set up JDK 21
@@ -24,62 +24,60 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-files
+          name: YourMedia
+          include-hidden-files: true
           path: |
-            target/*.jar
+            target/hello-world-0.0.1-SNAPSHOT.jar
             Dockerfile
             docker-compose.yml
             config/**
-
   deploy:
-    needs: build
     runs-on: ubuntu-latest
+    needs: build
     steps:
-      - name: Download artifact
+
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      - name: Download Build Artifact
         uses: actions/download-artifact@v4
         with:
-          name: app-files
-          path: ./deploy
+          name: YourMedia
+          path: .
 
-      - name: Setup SSH
+      - name: Setup SSH Key
         run: |
-          echo "${{ secrets.AWS_SSH_KEY }}" > key.pem
-          chmod 600 key.pem
+          echo "${{ secrets.AWS_SSH_KEY }}" > ecfkey.pem
+          chmod 600 ecfkey.pem
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.EC2_INSTANCE_IP }} >> ~/.ssh/known_hosts
-
-      - name: Deploy to EC2
+      - name: Deploy Application to EC2
         run: |
-          # Debug: Show files
-          echo "Local files:"
-          ls -la ./deploy
-
-          # Prepare EC2
-          ssh -i key.pem ec2-user@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
-            rm -rf ~/app
-            mkdir -p ~/app/config
+          # Vérification des fichiers locaux
+          ls -la
+          
+          # Préparation du dossier sur EC2
+          ssh -T -i ecfkey.pem ec2-user@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
+            sudo rm -rf /home/ec2-user/config
+            sudo mkdir -p /home/ec2-user/config
+            sudo chown -R ec2-user:ec2-user /home/ec2-user/config
+            sudo chmod -R 755 /home/ec2-user/config
           EOF
-
-          # Copy files
-          cd deploy
-          scp -i ../key.pem \
-            *.jar \
-            Dockerfile \
-            docker-compose.yml \
-            ec2-user@${{ secrets.EC2_INSTANCE_IP }}:~/app/
-
+          
+          # Envoi des fichiers sur EC2
+          scp -i ecfkey.pem target/*.jar Dockerfile docker-compose.yml ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
+          
+          # Vérification si le dossier config existe localement
           if [ -d "config" ]; then
-            scp -i ../key.pem -r config/* ec2-user@${{ secrets.EC2_INSTANCE_IP }}:~/app/config/
+            scp -i ecfkey.pem -r config ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
+          else
+            echo "Le dossier config n'existe pas localement"
+            exit 1
           fi
-
-          # Deploy
-          ssh -i ../key.pem ec2-user@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
-            cd ~/app
-            docker-compose down || true
-            docker system prune -f
+          
+          # Exécution des commandes sur EC2
+          ssh -T -i ecfkey.pem ec2-user@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
+            cd /home/ec2-user/
+            docker-compose down
             docker-compose up -d --build
-            echo "Waiting for containers to start..."
-            sleep 10
-            docker ps
-            docker logs hello-world-app
           EOF
