@@ -49,7 +49,7 @@ jobs:
       - name: Deploy Application to EC2
         run: |
           # Tentative d'envoi des fichiers sur EC2
-          scp -i ecfkey.pem -r target/*.jar Dockerfile docker-compose.yml ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
+          scp -i ecfkey.pem -r target/*.jar Dockerfile docker-compose.yml config/ ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
           # Exécution des commandes sur EC2
           ssh -T -i ecfkey.pem ec2-user@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
             cd /home/ec2-user/
