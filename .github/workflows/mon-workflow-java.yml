@@ -58,7 +58,7 @@ jobs:
           sudo rm -rf /home/ec2-user/config
           sudo mkdir -p /home/ec2-user/config
           scp -i ecfkey.pem target/*.jar Dockerfile docker-compose.yml ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/
-          scp -r ecfkey.pem config/* ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/config/
+          scp -i ecfkey.pem -r config/* ec2-user@${{ secrets.EC2_INSTANCE_IP }}:/home/ec2-user/config/
 
           # Exécution des commandes sur EC2
           ssh -T -i ecfkey.pem ec2-user@${{ secrets.EC2_INSTANCE_IP }} << 'EOF'
