@@ -21,7 +21,7 @@ services:
     container_name: loki
     command: -config.file=/etc/loki/loki-config.yaml
     volumes:
-      - ./config/loki-config.yaml:/etc/loki/loki-config.yaml
+      - ./config/loki-config.yaml:/etc/loki/loki-config.yml
       - loki-data:/loki
     ports:
       - "3100:3100"
